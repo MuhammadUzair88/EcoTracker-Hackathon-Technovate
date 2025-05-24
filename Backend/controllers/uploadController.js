@@ -3,6 +3,7 @@ const Incident = require("../models/incidents");
 const streamifier = require("streamifier");
 const mongoose = require('mongoose');  
 
+
 const uploadIncident = async (req, res) => {
   try {
     const {
@@ -66,4 +67,64 @@ const uploadIncident = async (req, res) => {
   }
 };
 
-module.exports = { uploadIncident };
+// Get all reports
+const getAllReports = async (req, res) => {
+  try {
+    const reports = await Incident.find().populate('createdBy', 'username');;
+    res.status(200).json(reports);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch reports", error });
+  }
+};
+
+// Get report by ID
+const getReportById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = await Incident.findById(id).populate('createdBy', 'username');
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    res.status(200).json(report);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch report", error });
+  }
+};
+
+// Controller to update incident status from 'new' to 'verified'
+async function verifyIncidentStatus(req, res) {
+  try {
+    const { incidentId } = req.params;
+
+    // Find the incident by ID
+    const incident = await Incident.findById(incidentId);
+    if (!incident) {
+      return res.status(404).json({ message: 'Incident not found' });
+    }
+
+    // Check current status, only allow change if status is 'new'
+    if (incident.status !== 'new') {
+      return res.status(400).json({ message: 'Status can only be updated from "new"' });
+    }
+
+    // Update the status to 'verified'
+    incident.status = 'verified';
+    await incident.save();
+
+    return res.status(200).json({ message: 'Incident status updated to verified', incident });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+}
+
+
+
+
+
+
+
+module.exports = { uploadIncident , getAllReports,
+  getReportById,verifyIncidentStatus };

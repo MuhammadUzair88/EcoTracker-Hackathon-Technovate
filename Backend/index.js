@@ -7,6 +7,8 @@ const cors = require('cors');
 
 const UserRoutes=require('./routes/UserRoutes');
 const IncidentRoutes=require('./routes/FileRoutes')
+const StaffRoutes=require('./routes/StaffRoutes');
+const ShiftRoutes=require('./routes/ShiftRoutes');
 const app=express();
 app.use(express.json());
 app.use(cors())
@@ -14,6 +16,8 @@ app.use(cors())
 
 app.use('/api/user',UserRoutes);
 app.use('/api/report',IncidentRoutes);
+app.use('/api/staff',StaffRoutes);
+app.use('/api/shift',ShiftRoutes);
 
 
 //Connect To MongoDB

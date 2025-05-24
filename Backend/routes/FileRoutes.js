@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const { uploadIncident } = require("../controllers/uploadController");
+const { uploadIncident, getAllReports, getReportById, verifyIncidentStatus } = require("../controllers/uploadController");
 
 const router = express.Router();
 
@@ -26,5 +26,9 @@ const conditionalMulter = (req, res, next) => {
 
 // Route
 router.post('/incidentupload', conditionalMulter, uploadIncident);
+router.get('/getall',getAllReports );
+router.get('/get/:id',getReportById );
+router.post('/change/:incidentId',verifyIncidentStatus);
+
 
 module.exports = router;
