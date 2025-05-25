@@ -25,43 +25,47 @@ exports.getAllShifts = async (req, res) => {
   }
 };
 
-// Update shift status (and incident status accordingly)
 exports.updateShiftStatus = async (req, res) => {
   try {
-    const { id } = req.params;        // shift id
-    const { status } = req.body;      // new shift status: 'assigned', 'in_progress', 'resolved'
+    const { id } = req.params; // shift id
+    const { status, lat, lng } = req.body;
 
     if (!['assigned', 'in_progress', 'resolved'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status value' });
     }
 
-    // Update shift status
-    const shift = await Shift.findByIdAndUpdate(id, { status }, { new: true });
+    const shift = await Shift.findById(id);
+    if (!shift) return res.status(404).json({ error: 'Shift not found' });
 
-    if (!shift) {
-      return res.status(404).json({ error: 'Shift not found' });
-    }
+    // Update status
+    shift.status = status;
 
-    // Sync incident status based on shift status
-    let incidentStatusToUpdate;
+    // Set time and location
     if (status === 'in_progress') {
-      incidentStatusToUpdate = 'in_progress';
-    } else if (status === 'resolved') {
-      incidentStatusToUpdate = 'resolved';
-      // Optionally set shift end time when resolved
+      shift.startTime = new Date();
+      shift.clockInLocation = { lat, lng };
+    }
+
+    if (status === 'resolved') {
       shift.endTime = new Date();
-      await shift.save();
-    } else {
-      incidentStatusToUpdate = null;
+      shift.clockOutLocation = { lat, lng };
     }
 
-    if (incidentStatusToUpdate) {
-      await Incident.findByIdAndUpdate(shift.incident, { status: incidentStatusToUpdate });
+    await shift.save();
+
+    // Sync incident status
+    const incidentStatus = status === 'in_progress' ? 'in_progress'
+                        : status === 'resolved' ? 'resolved'
+                        : null;
+
+    if (incidentStatus) {
+      await Incident.findByIdAndUpdate(shift.incident, { status: incidentStatus });
     }
 
-    res.json(shift);
+    res.json({ message: `Shift status updated to ${status}`, shift });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 

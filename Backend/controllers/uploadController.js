@@ -78,20 +78,51 @@ const getAllReports = async (req, res) => {
 };
 
 // Get report by ID
+// Get all reports by user ID
+const getReportByUserId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    // Fetch reports only created by this user
+    const reports = await Incident.find({ createdBy: id });
+
+    // Check if any reports exist
+    if (reports.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    res.status(200).json(reports);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch user reports", error });
+  }
+};
+
+// Get report by report ID
 const getReportById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid report ID" });
+    }
+
     const report = await Incident.findById(id).populate('createdBy', 'username');
 
     if (!report) {
       return res.status(404).json({ message: "Report not found" });
     }
 
-    res.status(200).json(report);
+    res.status(200).json({ reports: report }); // ✅ matches frontend expectation
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch report", error });
   }
 };
+
+
 
 // Controller to update incident status from 'new' to 'verified'
 async function verifyIncidentStatus(req, res) {
@@ -127,4 +158,4 @@ async function verifyIncidentStatus(req, res) {
 
 
 module.exports = { uploadIncident , getAllReports,
-  getReportById,verifyIncidentStatus };
+  verifyIncidentStatus,getReportByUserId ,getReportById };

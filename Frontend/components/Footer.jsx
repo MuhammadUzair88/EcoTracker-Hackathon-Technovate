@@ -1,67 +1,103 @@
-const Footer = () => {
+// // components/Footer.jsx
+// export default function Footer() {
+//   return (
+//     <footer className="bg-green-700 text-white text-sm py-6 mt-10">
+//       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+//         <div>
+//           <h4 className="font-semibold text-lg mb-2">About EcoTracker</h4>
+//           <p>
+//             Empowering communities to report and resolve local environmental issues through collaboration, data, and action.
+//           </p>
+//         </div>
+//         <div>
+//           <h4 className="font-semibold text-lg mb-2">Quick Links</h4>
+//           <ul className="space-y-1">
+//             <li><a href="/report" className="hover:underline">Report Incident</a></li>
+//             <li><a href="/map" className="hover:underline">View Map</a></li>
+//             <li><a href="/community" className="hover:underline">Community Forum</a></li>
+//             <li><a href="/login" className="hover:underline">Login</a></li>
+//           </ul>
+//         </div>
+//         <div>
+//           <h4 className="font-semibold text-lg mb-2">Contact</h4>
+//           <p>Email: support@ecotracker.org</p>
+//           <p>Twitter: @EcoTrackerApp</p>
+//           <p>GitHub: github.com/EcoTracker</p>
+//         </div>
+//       </div>
+//       <div className="text-center pt-4 mt-4 border-t border-white/20">
+//         &copy; {new Date().getFullYear()} EcoTracker. All rights reserved.
+//       </div>
+//     </footer>
+//   );
+// }
+
+// components/Footer.jsx
+import { FaTwitter, FaGithub, FaEnvelope } from "react-icons/fa";
+
+export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300 py-8">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Column 1 */}
+    <footer className="bg-green-700 text-white text-sm py-10 ">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        {/* About Section */}
         <div>
-          <h2 className="text-xl font-bold text-white">MyApp</h2>
-          <p className="mt-2 text-sm">
-            Building modern web experiences with speed and creativity.
+          <h4 className="font-bold text-xl mb-3">About EcoTracker</h4>
+          <p className="text-white/80 leading-relaxed">
+            Empowering communities to report and resolve local environmental issues 
+            through collaboration, data, and action.
           </p>
         </div>
-
-        {/* Column 2 */}
+        
+        {/* Quick Links */}
         <div>
-          <h3 className="text-lg font-semibold text-white mb-2">Quick Links</h3>
-          <ul className="space-y-2 text-sm">
+          <h4 className="font-bold text-xl mb-3">Quick Links</h4>
+          <ul className="space-y-2 text-white/90">
             <li>
-              <a href="/" className="hover:text-white">
-                Home
-              </a>
+              <a href="/report" className="hover:text-green-300 transition-colors">Report Incident</a>
             </li>
             <li>
-              <a href="/services" className="hover:text-white">
-                Services
-              </a>
+              <a href="/map" className="hover:text-green-300 transition-colors">View Map</a>
             </li>
             <li>
-              <a href="/about" className="hover:text-white">
-                About
-              </a>
+              <a href="/community" className="hover:text-green-300 transition-colors">Community Forum</a>
             </li>
             <li>
-              <a href="/contact" className="hover:text-white">
-                Contact
+              <a href="/login" className="hover:text-green-300 transition-colors">Login</a>
+            </li>
+          </ul>
+        </div>
+        
+        {/* Contact Section */}
+        <div>
+          <h4 className="font-bold text-xl mb-3">Contact</h4>
+          <ul className="space-y-2 text-white/90">
+            <li className="flex items-center gap-2">
+              <FaEnvelope className="text-green-300" />
+              <a href="mailto:support@ecotracker.org" className="hover:text-green-300 transition-colors">
+                support@ecotracker.org
+              </a>
+            </li>
+            <li className="flex items-center gap-2">
+              <FaTwitter className="text-green-300" />
+              <a href="https://twitter.com/EcoTrackerApp" target="_blank" rel="noopener noreferrer" className="hover:text-green-300 transition-colors">
+                @EcoTrackerApp
+              </a>
+            </li>
+            <li className="flex items-center gap-2">
+              <FaGithub className="text-green-300" />
+              <a href="https://github.com/EcoTracker" target="_blank" rel="noopener noreferrer" className="hover:text-green-300 transition-colors">
+                github.com/EcoTracker
               </a>
             </li>
           </ul>
         </div>
-
-        {/* Column 3 */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-2">Follow Us</h3>
-          <div className="flex space-x-4">
-            <a href="#" className="hover:text-white">
-              🌐
-            </a>
-            <a href="#" className="hover:text-white">
-              🐦
-            </a>
-            <a href="#" className="hover:text-white">
-              📷
-            </a>
-            <a href="#" className="hover:text-white">
-              🔗
-            </a>
-          </div>
-        </div>
       </div>
 
-      <div className="border-t border-gray-700 mt-8 pt-4 text-center text-sm">
-        © {new Date().getFullYear()} MyApp. All rights reserved.
+      {/* Footer Bottom */}
+      <div className="text-center pt-6 mt-8 border-t border-white/20 text-white/70">
+        &copy; {new Date().getFullYear()} EcoTracker. All rights reserved.
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

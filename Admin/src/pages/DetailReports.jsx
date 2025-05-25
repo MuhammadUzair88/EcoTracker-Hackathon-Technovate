@@ -27,10 +27,10 @@ const DetailReports = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/report/get/${id}`
+        `http://localhost:5000/api/report/getreport/${id}`
       );
       if (response.status === 200) {
-        setReport(response.data);
+        setReport(response.data.reports);
       }
     } catch (error) {
       console.error("Error fetching report", error);
@@ -57,6 +57,7 @@ const DetailReports = () => {
 
   useEffect(() => {
     fetchData();
+    console.log(report);
   }, [id]);
 
   if (loading) {
@@ -74,6 +75,12 @@ const DetailReports = () => {
       </div>
     );
   }
+
+  const hasValidCoordinates =
+    typeof report.latitude === "number" &&
+    typeof report.longitude === "number" &&
+    !isNaN(report.latitude) &&
+    !isNaN(report.longitude);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-emerald-50 p-6">
@@ -147,22 +154,28 @@ const DetailReports = () => {
           </div>
 
           {/* Map Section */}
-          <div className="h-80 rounded-xl overflow-hidden shadow-lg border border-gray-200">
-            <MapContainer
-              center={[report.latitude, report.longitude]}
-              zoom={13}
-              scrollWheelZoom={false}
-              className="w-full h-full"
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
-              />
-              <Marker position={[report.latitude, report.longitude]}>
-                <Popup>{report.title}</Popup>
-              </Marker>
-            </MapContainer>
-          </div>
+          {hasValidCoordinates ? (
+            <div className="h-80 rounded-xl overflow-hidden shadow-lg border border-gray-200">
+              <MapContainer
+                center={[report.latitude, report.longitude]}
+                zoom={13}
+                scrollWheelZoom={false}
+                className="w-full h-full"
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution="&copy; OpenStreetMap contributors"
+                />
+                <Marker position={[report.latitude, report.longitude]}>
+                  <Popup>{report.title}</Popup>
+                </Marker>
+              </MapContainer>
+            </div>
+          ) : (
+            <div className="h-80 flex items-center justify-center text-gray-500 border border-gray-200 rounded-xl shadow-inner">
+              Location data not available
+            </div>
+          )}
         </div>
       </div>
     </div>

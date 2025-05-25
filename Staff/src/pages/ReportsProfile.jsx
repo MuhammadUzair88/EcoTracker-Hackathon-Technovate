@@ -5,7 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useStaff } from "../context/StaffContext";
 
-// Leaflet Marker Icons Fix
+// Fix Leaflet icon issue
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -54,41 +54,64 @@ const ReportsProfile = () => {
       nextStatus = "in_progress";
     } else if (shift.status === "in_progress") {
       nextStatus = "resolved";
+    } else {
+      return;
     }
 
-    try {
-      await axios.put(`http://localhost:5000/api/shift/update/${shift._id}`, {
-        status: nextStatus,
-      });
-
-      const updatedShifts = shifts.map((s) =>
-        s._id === shift._id
-          ? {
-              ...s,
-              status: nextStatus,
-              incident: { ...s.incident, status: nextStatus },
-            }
-          : s
-      );
-      setShifts(updatedShifts);
-      setSelectedShift((prev) =>
-        prev && prev._id === shift._id
-          ? {
-              ...prev,
-              status: nextStatus,
-              incident: { ...prev.incident, status: nextStatus },
-            }
-          : prev
-      );
-    } catch (err) {
-      console.error("Failed to update status:", err);
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported.");
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          await axios.put(
+            `http://localhost:5000/api/shift/update/${shift._id}`,
+            {
+              status: nextStatus,
+              lat: latitude,
+              lng: longitude,
+            }
+          );
+
+          const updatedShifts = shifts.map((s) =>
+            s._id === shift._id
+              ? {
+                  ...s,
+                  status: nextStatus,
+                  incident: { ...s.incident, status: nextStatus },
+                }
+              : s
+          );
+          setShifts(updatedShifts);
+          setSelectedShift((prev) =>
+            prev && prev._id === shift._id
+              ? {
+                  ...prev,
+                  status: nextStatus,
+                  incident: { ...prev.incident, status: nextStatus },
+                }
+              : prev
+          );
+        } catch (err) {
+          console.error("Failed to update shift:", err);
+          alert("Shift update failed.");
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        alert("Failed to get your location.");
+      }
+    );
   };
 
   if (!user) {
     return (
       <div className="text-center py-20 text-lg text-gray-600">
-        🔒 Please log in to view your assigned incidents.
+        🔐 Please log in to view your assigned incidents.
       </div>
     );
   }
@@ -213,6 +236,34 @@ const ReportsProfile = () => {
                   selectedShift.incident.longitude,
                 ]}
               />
+
+              {selectedShift.clockInLocation && (
+                <Marker
+                  position={[
+                    selectedShift.clockInLocation.lat,
+                    selectedShift.clockInLocation.lng,
+                  ]}
+                  icon={L.icon({
+                    iconUrl:
+                      "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                    iconSize: [32, 32],
+                  })}
+                />
+              )}
+
+              {selectedShift.clockOutLocation && (
+                <Marker
+                  position={[
+                    selectedShift.clockOutLocation.lat,
+                    selectedShift.clockOutLocation.lng,
+                  ]}
+                  icon={L.icon({
+                    iconUrl:
+                      "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                    iconSize: [32, 32],
+                  })}
+                />
+              )}
             </MapContainer>
           </div>
 

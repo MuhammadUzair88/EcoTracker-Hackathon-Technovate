@@ -20,7 +20,17 @@ const shiftSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  endTime: Date
+  endTime: Date,
+
+  clockInLocation: {
+    type: { lat: Number, lng: Number },
+    default: null
+  },
+  clockOutLocation: {
+    type: { lat: Number, lng: Number },
+    default: null
+  }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Shift', shiftSchema);
