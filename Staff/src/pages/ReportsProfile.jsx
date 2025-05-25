@@ -9,6 +9,7 @@ import { useStaff } from "../context/StaffContext";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { Link } from "react-router-dom";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -34,7 +35,8 @@ const ReportsProfile = () => {
       try {
         const res = await axios.get("http://localhost:5000/api/shift/get");
         const assignedShifts = res.data.filter(
-          (shift) => shift.assignedTo?._id === user?._id
+          (shift) =>
+            shift.assignedTo?._id === user?._id && shift.status !== "resolved"
         );
         setShifts(assignedShifts);
       } catch (err) {
@@ -118,46 +120,57 @@ const ReportsProfile = () => {
 
   return (
     <div className="w-full px-4 sm:px-8 lg:px-20 py-10 bg-green-50 min-h-screen">
+      {/* Resolved Reports Button */}
+      <Link
+        to="/resolvedreports"
+        className="inline-block mb-8 text-white bg-green-700 hover:bg-green-900 px-5 py-2 rounded-xl shadow-md transition duration-300"
+      >
+        ✅ View Resolved Reports
+      </Link>
+
       {!selectedShift ? (
         <>
           <h2 className="text-3xl font-bold text-green-700 mb-8 text-center">
             📋 My Assigned Incidents
           </h2>
           <div className="grid grid-cols-1 gap-6">
-            {shifts.length > 0 ? (
-              shifts.map((shift) => (
-                <div
-                  key={shift._id}
-                  className="bg-white border-l-4 p-6 rounded-xl shadow-sm hover:shadow-lg border-green-600 transition duration-300"
-                >
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div className="flex flex-col gap-y-2">
-                      <h3 className="text-xl font-semibold text-green-800 capitalize">
-                        {shift.incident.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 capitalize">
-                        📂 <strong>Category:</strong> {shift.incident.category}
-                      </p>
-                      <p className="text-sm text-gray-600 mt-1 capitalize">
-                        🏷 <strong>Status:</strong>{" "}
-                        <span
-                          className={`text-white px-4 py-1 rounded-3xl ${
-                            statusColors[shift.incident.status]
-                          }`}
-                        >
-                          {shift.status.replace("_", " ")}
-                        </span>
-                      </p>
+            {shifts.filter((shift) => shift.incident).length > 0 ? (
+              shifts
+                .filter((shift) => shift.incident)
+                .map((shift) => (
+                  <div
+                    key={shift._id}
+                    className="bg-white border-l-4 p-6 rounded-xl shadow-sm hover:shadow-lg border-green-600 transition duration-300"
+                  >
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                      <div className="flex flex-col gap-y-2">
+                        <h3 className="text-xl font-semibold text-green-800 capitalize">
+                          {shift.incident.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 capitalize">
+                          📂 <strong>Category:</strong>{" "}
+                          {shift.incident.category}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1 capitalize">
+                          🏷 <strong>Status:</strong>{" "}
+                          <span
+                            className={`text-white px-4 py-1 rounded-3xl ${
+                              statusColors[shift.incident.status]
+                            }`}
+                          >
+                            {shift.status.replace("_", " ")}
+                          </span>
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setSelectedShift(shift)}
+                        className="text-sm bg-green-700 hover:bg-green-900 text-white px-4 py-2 rounded-md shadow transition"
+                      >
+                        View Details
+                      </button>
                     </div>
-                    <button
-                      onClick={() => setSelectedShift(shift)}
-                      className="text-sm bg-green-700 hover:bg-green-900 text-white px-4 py-2 rounded-md shadow transition"
-                    >
-                      View Details
-                    </button>
                   </div>
-                </div>
-              ))
+                ))
             ) : (
               <div className="text-center text-gray-500 text-md">
                 No incidents assigned yet.

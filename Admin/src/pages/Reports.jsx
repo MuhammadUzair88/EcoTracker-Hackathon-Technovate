@@ -9,7 +9,7 @@ const Reports = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/report/getall`
+        "http://localhost:5000/api/report/getall" // URL must be a string with quotes
       );
       if (response.status === 200) {
         setReports(response.data);
@@ -19,15 +19,40 @@ const Reports = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    alert(`Delete report ID: ${id} (Feature coming soon)`);
-    // Add real delete logic here later
+  const handleDelete = async (id) => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/api/report/deleteincident/${id}`
+      );
+      if (res.data.success) {
+        alert("Incident Deleted Successfully");
+        setReports(reports.filter((report) => report._id !== id));
+      }
+    } catch (error) {
+      console.error("Failed to delete Incident", error.message);
+      alert("Error deleting Incident");
+    }
   };
 
   useEffect(() => {
     fetchData();
-    console.log(reports);
+    // No need to console.log(reports) here because fetchData is async
   }, []);
+
+  const getStatusBadgeClass = (status) => {
+    switch (status.toLowerCase()) {
+      case "new":
+        return "bg-gray-200 text-gray-800";
+      case "in_progress":
+        return "bg-yellow-100 text-yellow-800";
+      case "verified":
+        return "bg-blue-100 text-blue-800";
+      case "resolved":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-green-50 px-4 py-8 sm:px-6 lg:px-8">
@@ -62,9 +87,7 @@ const Reports = () => {
                 className="hover:bg-gray-50 transition duration-200"
               >
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  {report.createdBy
-                    ? report.createdBy?.username
-                    : " Anonymous " || "N/A"}
+                  {report.createdBy?.username || "Anonymous"}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {report.title}
@@ -74,19 +97,16 @@ const Reports = () => {
                 </td>
                 <td className="px-6 py-4">
                   <span
-                    className={`inline-flex px-2 text-xs font-semibold rounded-full 
-                      ${
-                        report.status === "new"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(
+                      report.status
+                    )}`}
                   >
                     {report.status}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-center space-x-6">
                   <Link
-                    to={`/report/${report._id}`}
+                    to={`/report/${report._id}`} // Link path must be string literal with backticks
                     title="View"
                     className="text-emerald-600 hover:text-emerald-900"
                   >

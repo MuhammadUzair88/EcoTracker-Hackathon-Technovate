@@ -17,8 +17,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user)); // Save user as string
-    alert("Logged in successfully!");
+    localStorage.setItem("user", JSON.stringify(data.user));
     setUser(data.user);
   };
 
@@ -29,8 +28,7 @@ export const AuthProvider = ({ children }) => {
     );
 
     localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user)); // Save user as string
-    alert("Registered Successfully!");
+    localStorage.setItem("user", JSON.stringify(data.user));
     setUser(data.user);
   };
 

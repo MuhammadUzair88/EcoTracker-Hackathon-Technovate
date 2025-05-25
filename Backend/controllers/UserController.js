@@ -44,6 +44,7 @@ const RegisterUser = async (req, res) => {
         username:user.username,
         email:user.email,
         isAnonymous:user.isAnonymous,
+        role:user.role,
       }
     });
   } catch (err) {
@@ -85,6 +86,7 @@ const LoginUser=async(req,res)=>{
         username:user.username,
         email:user.email,
         isAnonymous:user.isAnonymous,
+       role:user.role,
       }
         
     })

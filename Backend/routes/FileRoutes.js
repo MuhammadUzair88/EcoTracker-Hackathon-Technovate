@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const { uploadIncident, getAllReports, verifyIncidentStatus, getReportByUserId, getReportById } = require("../controllers/uploadController");
+const { uploadIncident, getAllReports, verifyIncidentStatus, getReportByUserId, getReportById, deleteIncident } = require("../controllers/uploadController");
 
 const router = express.Router();
 
@@ -30,6 +30,7 @@ router.get('/getall',getAllReports );
 router.get('/get/:id',getReportByUserId );
 router.get('/getreport/:id',getReportById );
 router.post('/change/:incidentId',verifyIncidentStatus);
+router.delete('/deleteincident/:id',deleteIncident);
 
 
 module.exports = router;

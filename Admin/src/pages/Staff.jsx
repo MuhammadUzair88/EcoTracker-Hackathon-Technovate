@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEye, FaTrash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Staff = () => {
   const [staff, setStaff] = useState([]);
@@ -14,6 +15,8 @@ const Staff = () => {
     staffId: "",
     address: "",
   });
+
+  const Navigate = useNavigate();
 
   // Fetch staff list from backend
   const fetchStaff = async () => {
@@ -29,9 +32,19 @@ const Staff = () => {
     fetchStaff();
   }, []);
 
-  // Delete handler (feature placeholder)
-  const handleDelete = (id) => {
-    alert(`Delete staff ID: ${id} (Feature coming soon)`);
+  const handleDelete = async (id) => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/api/staff/staffdelete/${id}`
+      );
+      if (res.data.success) {
+        alert("Staff Deleted Successfully");
+        setStaff(staff.filter((member) => member._id !== id));
+      }
+    } catch (error) {
+      console.error("Failed to delete staff", error.message);
+      alert("Error deleting staff");
+    }
   };
 
   // Create new staff with form data and photo upload
@@ -129,7 +142,7 @@ const Staff = () => {
                   <td className="px-6 py-4 text-sm text-center space-x-4">
                     <button
                       title="View"
-                      onClick={() => setSelected(member)}
+                      onClick={() => Navigate(`/staff/${member._id}`)}
                       className="text-emerald-600 hover:text-emerald-900"
                     >
                       <FaEye className="inline h-5 w-5" />
@@ -194,7 +207,7 @@ const Staff = () => {
 
       {/* Add Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-emerald-100 bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold text-emerald-800 mb-4">
               Add New Staff

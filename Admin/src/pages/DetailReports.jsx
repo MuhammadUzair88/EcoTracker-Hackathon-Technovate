@@ -27,7 +27,7 @@ const DetailReports = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/report/getreport/${id}`
+        `http://localhost:5000/api/report/getreport/${id}` // <-- Template literal backticks needed
       );
       if (response.status === 200) {
         setReport(response.data.reports);
@@ -43,7 +43,7 @@ const DetailReports = () => {
     try {
       setVerifying(true);
       const response = await axios.post(
-        `http://localhost:5000/api/report/change/${id}`
+        `http://localhost:5000/api/report/change/${id}` // <-- Template literal backticks needed
       );
       if (response.status === 200) {
         fetchData(); // Refresh the report status after verification
@@ -57,7 +57,7 @@ const DetailReports = () => {
 
   useEffect(() => {
     fetchData();
-    console.log(report);
+    // console.log(report); // Optional: might log null on first render
   }, [id]);
 
   if (loading) {
@@ -83,16 +83,20 @@ const DetailReports = () => {
     !isNaN(report.longitude);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-emerald-50 p-6">
-      <div className="max-w-6xl mx-auto backdrop-blur-xl bg-white/70 border border-emerald-200 rounded-3xl shadow-2xl p-8 space-y-6">
-        <h2 className="text-5xl font-extrabold text-center text-emerald-800 mb-6">
+    <div className="min-h-screen via-white to-emerald-50 p-6">
+      <div className="max-w-6xl mx-auto backdrop-blur-xl bg-white/70 rounded-3xl shadow-2xl p-8 space-y-6">
+        <h2 className="text-5xl font-bold text-center text-emerald-800 mb-6">
+          {" "}
+          {/* fixed typo: font-=bold → font-bold */}
           Report Details
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Report Details */}
           <div className="space-y-5">
-            <h3 className="text-3xl font-bold text-gray-800">{report.title}</h3>
+            <h3 className="text-3xl font-semibold text-gray-800">
+              {report.title}
+            </h3>
             <p className="text-gray-600">
               <span className="font-semibold">Reporter:</span>{" "}
               {report.createdBy?.username || "Anonymous"}
@@ -106,10 +110,10 @@ const DetailReports = () => {
               <span
                 className={`inline-block mt-1 px-3 py-1 rounded-full text-sm font-medium transition ${
                   report.status?.toLowerCase() === "new"
-                    ? "bg-red-100 text-red-800"
+                    ? "bg-gray-200 text-gray-800"
                     : report.status?.toLowerCase() === "verified"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-yellow-100 text-yellow-800"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-green-100 text-green-800"
                 }`}
               >
                 {report.status}
@@ -122,7 +126,7 @@ const DetailReports = () => {
                 onClick={handleVerify}
                 disabled={verifying}
                 className={`mt-4 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-5 rounded-lg shadow-md transition duration-300 ${
-                  verifying && "opacity-70 cursor-not-allowed"
+                  verifying ? "opacity-70 cursor-not-allowed" : ""
                 }`}
               >
                 <FaCheckCircle className="text-lg" />
@@ -133,7 +137,7 @@ const DetailReports = () => {
             {/* Create Shift button if status is 'verified' */}
             {report.status?.toLowerCase() === "verified" && (
               <button
-                onClick={() => navigate(`/create-shift/${report._id}`)}
+                onClick={() => navigate(`/create-shift/${report._id}`)} // <-- backticks needed here as well
                 className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-lg shadow-md transition duration-300"
               >
                 Create Shift
@@ -143,7 +147,7 @@ const DetailReports = () => {
             {report.photoUrl ? (
               <img
                 src={report.photoUrl}
-                alt={`Report: ${report.title}`}
+                alt={`Report: ${report.title}`} // <-- backticks for template literal
                 className="w-full h-64 object-cover rounded-xl shadow-lg border border-gray-200"
               />
             ) : (

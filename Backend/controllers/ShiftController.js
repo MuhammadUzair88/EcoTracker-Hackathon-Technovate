@@ -4,14 +4,23 @@ const Incident = require('../models/incidents');
 // Create a new shift
 exports.createShift = async (req, res) => {
   try {
-    const { assignedTo, incident } = req.body;
-    const shift = new Shift({ assignedTo, incident });
+    const { assignedTo, incident, startTime, endTime } = req.body;
+
+    if (startTime && endTime && new Date(endTime) < new Date(startTime)) {
+      return res
+        .status(400)
+        .json({ error: 'End time cannot be before start time.' });
+    }
+
+    const shift = new Shift({ assignedTo, incident, startTime, endTime });
     await shift.save();
+
     res.status(201).json(shift);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Get all shifts
 exports.getAllShifts = async (req, res) => {

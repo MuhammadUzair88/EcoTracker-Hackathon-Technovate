@@ -1,15 +1,21 @@
-// src/pages/Stafflogin.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useStaff } from "../context/StaffContext";
 
-export default function Stafflogin() {
+export default function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ staffId: "", email: "" });
   const [error, setError] = useState("");
 
-  const { setUser } = useStaff();
+  const { user, setUser } = useStaff();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/reportsprofile");
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,7 +33,7 @@ export default function Stafflogin() {
       if (response.data.success) {
         alert("✅ Login successful!");
         setUser(response.data.staff);
-        localStorage.setItem("staff", JSON.stringify(response.data.staff)); // ✅ Save to localStorage
+        localStorage.setItem("staff", JSON.stringify(response.data.staff));
         navigate("/reportsprofile");
       }
     } catch (err) {
@@ -41,16 +47,14 @@ export default function Stafflogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-200 via-green-300 to-green-500 flex items-center justify-center px-4">
       <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex flex-col md:flex-row w-full max-w-5xl">
-        {/* Illustration */}
         <div className="hidden sm:flex sm:w-[30%] items-center justify-center p-4">
           <img
-            src="/Images/login-eco.svg"
+            src="/UserLogin[1].png"
             alt="Login Illustration"
             className="max-w-full h-auto"
           />
         </div>
 
-        {/* Login Form */}
         <form
           onSubmit={handleSubmit}
           className="w-full sm:w-[70%] flex flex-col justify-center"
@@ -79,7 +83,6 @@ export default function Stafflogin() {
             required
           />
 
-          {/* Error message */}
           {error && (
             <p className="text-red-600 text-sm mb-4 text-center">{error}</p>
           )}

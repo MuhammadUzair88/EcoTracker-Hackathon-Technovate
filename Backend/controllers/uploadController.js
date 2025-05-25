@@ -2,6 +2,8 @@ const cloudinary = require("../config/cloudinary");
 const Incident = require("../models/incidents");
 const streamifier = require("streamifier");
 const mongoose = require('mongoose');  
+const incidents = require("../models/incidents");
+const Shift = require("../models/Shift");
 
 
 const uploadIncident = async (req, res) => {
@@ -122,6 +124,36 @@ const getReportById = async (req, res) => {
   }
 };
 
+const deleteIncident = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // First, delete all related shifts
+    await Shift.deleteMany({ incident: id });
+
+    // Then delete the incident
+    const deletedIncident = await incidents.findByIdAndDelete(id);
+
+    if (!deletedIncident) {
+      return res.status(404).json({ success: false, message: "Incident not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Incident and related shifts deleted successfully",
+      deletedIncident
+    });
+  } catch (error) {
+    console.error("Error deleting incident and shifts:", error.message);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+
+
+
+
+
 
 
 // Controller to update incident status from 'new' to 'verified'
@@ -157,5 +189,7 @@ async function verifyIncidentStatus(req, res) {
 
 
 
+
+
 module.exports = { uploadIncident , getAllReports,
-  verifyIncidentStatus,getReportByUserId ,getReportById };
+  verifyIncidentStatus,getReportByUserId ,getReportById,deleteIncident };
