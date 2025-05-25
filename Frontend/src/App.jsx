@@ -6,17 +6,14 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Report from "./pages/Report";
 import UserDashboard from "./pages/UserDashboard";
-
-// Check if user is logged in
-const isAuthenticated = () => {
-  return localStorage.getItem("user"); // You can enhance this with validation
-};
+import { useAuth } from "./context/UserContext";
 
 const App = () => {
+  const { user } = useAuth(); // ✅ Use context instead of localStorage
+
   return (
     <div>
       <Navbar />
-
       <div className="min-h-screen">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -26,23 +23,16 @@ const App = () => {
           {/* Protected routes */}
           <Route
             path="/report"
-            element={
-              isAuthenticated() ? <Report /> : <Navigate to="/login" replace />
-            }
+            element={user ? <Report /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/dashboard"
             element={
-              isAuthenticated() ? (
-                <UserDashboard />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              user ? <UserDashboard /> : <Navigate to="/login" replace />
             }
           />
         </Routes>
       </div>
-
       <Footer />
     </div>
   );

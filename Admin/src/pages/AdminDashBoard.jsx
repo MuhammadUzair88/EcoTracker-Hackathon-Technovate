@@ -1,5 +1,26 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+} from "chart.js";
+import { Pie, Bar } from "react-chartjs-2";
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title
+);
 
 export default function AdminDashboard() {
   const [summary, setSummary] = useState(null);
@@ -22,19 +43,95 @@ export default function AdminDashboard() {
     fetchSummary();
   }, []);
 
-  if (loading)
+  if (loading) {
     return (
       <div className="p-8 flex justify-center items-center h-screen">
         <span className="text-lg text-gray-600 animate-pulse">Loading...</span>
       </div>
     );
+  }
 
-  if (!summary)
+  if (!summary) {
     return (
       <div className="p-8 text-center text-red-500 font-semibold">
         No data available.
       </div>
     );
+  }
+
+  // Define colors for incident statuses
+  // Make sure colors match the order of the labels!
+  const statusColorsMap = {
+    new: "#9ca3af", // gray
+    verified: "#3b82f6", // blue
+    in_progress: "#facc15", // yellow
+    resolved: "#22c55e", // green
+  };
+
+  // Get statuses and colors in the order they appear
+  const statusLabels = Object.keys(summary.incidentsByStatus).map((key) =>
+    key.replaceAll("_", " ")
+  );
+  const statusRawKeys = Object.keys(summary.incidentsByStatus);
+
+  // Prepare colors in same order as data
+  const statusColors = statusRawKeys.map(
+    (key) => statusColorsMap[key] || "#d1d5db" // fallback gray
+  );
+
+  const incidentStatusData = {
+    labels: statusLabels,
+    datasets: [
+      {
+        label: "Incidents by Status",
+        data: Object.values(summary.incidentsByStatus),
+        backgroundColor: statusColors,
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const incidentCategoryData = {
+    labels: Object.keys(summary.incidentsByCategory),
+    datasets: [
+      {
+        label: "Incidents by Category",
+        data: Object.values(summary.incidentsByCategory),
+        backgroundColor: [
+          "#f97316",
+          "#0ea5e9",
+          "#8b5cf6",
+          "#10b981",
+          "#64748b",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const overviewData = {
+    labels: ["Total Staff", "Total Users", "Active Shifts"],
+    datasets: [
+      {
+        label: "Count",
+        data: [summary.totalStaff, summary.totalUsers, summary.activeShifts],
+        backgroundColor: ["#22d3ee", "#3b82f6", "#6366f1"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: false,
+      },
+    },
+  };
 
   return (
     <div className="p-6 sm:p-10 max-w-7xl mx-auto">
@@ -42,27 +139,28 @@ export default function AdminDashboard() {
         Admin Dashboard
       </h1>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div className="bg-white border-l-4 border-green-500 p-6 rounded-2xl shadow hover:shadow-md transition">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">
-            Incidents by Status
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div className="bg-white p-6 rounded-2xl shadow">
+          <h2 className="text-xl font-semibold text-green-700 mb-4">
+            Incident Distribution
           </h2>
-          <ul className="space-y-2 text-sm text-gray-600">
-            {["new", "verified", "in_progress", "resolved"].map((status) => (
-              <li key={status} className="flex justify-between">
-                <span className="capitalize">{status.replace("_", " ")}:</span>
-                <span className="font-bold text-green-700">
-                  {summary.incidentsByStatus[status] || 0}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <Pie data={incidentStatusData} options={chartOptions} />
         </div>
 
-        <Card title="Total Staff" count={summary.totalStaff} />
-        <Card title="Total Users" count={summary.totalUsers} />
-        <Card title="Active Shifts" count={summary.activeShifts} />
+        <div className="bg-white p-6 rounded-2xl shadow">
+          <h2 className="text-xl font-semibold text-green-700 mb-4">
+            System Overview
+          </h2>
+          <Bar data={overviewData} options={chartOptions} />
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl shadow col-span-full">
+          <h2 className="text-xl font-semibold text-green-700 mb-4">
+            Incident Categories
+          </h2>
+          <Bar data={incidentCategoryData} options={chartOptions} />
+        </div>
       </div>
 
       {/* Recent Incidents Table */}
@@ -85,8 +183,26 @@ export default function AdminDashboard() {
                 className="border-b hover:bg-green-50 transition"
               >
                 <td className="py-3 px-2">{incident.title}</td>
-                <td className="py-3 px-2 capitalize text-green-700 font-medium">
-                  {incident.status.replace("_", " ")}
+                <td className="py-3 px-2">
+                  <span
+                    className={`capitalize font-medium px-3 py-1 rounded-full text-sm`}
+                    style={{
+                      backgroundColor:
+                        statusColorsMap[incident.status] || "#f3f4f6",
+                      color:
+                        incident.status === "in_progress"
+                          ? "#92400e"
+                          : incident.status === "new"
+                          ? "#374151"
+                          : incident.status === "verified"
+                          ? "#1e40af"
+                          : incident.status === "resolved"
+                          ? "#166534"
+                          : "#6b7280",
+                    }}
+                  >
+                    {incident.status.replaceAll("_", " ")}
+                  </span>
                 </td>
                 <td className="py-3 px-2 text-gray-600">
                   {new Date(incident.createdAt).toLocaleString()}
@@ -99,11 +215,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-// Reusable card component
-const Card = ({ title, count }) => (
-  <div className="bg-white border-l-4 border-green-500 p-6 rounded-2xl shadow hover:shadow-md transition flex flex-col justify-center items-center">
-    <h2 className="text-lg font-semibold text-gray-700 mb-2">{title}</h2>
-    <span className="text-5xl font-bold text-green-700">{count}</span>
-  </div>
-);

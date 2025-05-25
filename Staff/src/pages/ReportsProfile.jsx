@@ -179,7 +179,7 @@ const ReportsProfile = () => {
           </div>
         </>
       ) : (
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bg-white rounded-xl shadow-md p-6 max-w-6xl mx-auto">
           <button
             onClick={() => setSelectedShift(null)}
             className="mb-4 text-sm text-blue-600 hover:underline"
@@ -187,48 +187,54 @@ const ReportsProfile = () => {
             ← Back to all reports
           </button>
 
-          <h2 className="text-2xl font-bold text-green-700 mb-1">
+          {/* Centered Title */}
+          <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">
             {selectedShift.incident.title}
           </h2>
-          <p className="text-sm text-gray-500 mb-2">
-            🕓 Submitted:{" "}
-            {new Date(selectedShift.incident.createdAt).toLocaleString()}
-          </p>
-          <p className="text-md text-gray-700 mb-1">
-            📂 <strong>Category:</strong> {selectedShift.incident.category}
-          </p>
-          <p className="text-md text-gray-700 mb-1">
-            🏷 <strong>Status:</strong>{" "}
-            <span
-              className={`px-2 py-1 rounded text-white text-sm ${
-                statusColors[selectedShift.incident.status]
-              }`}
-            >
-              {selectedShift.status.replace("_", " ")}
-            </span>
-          </p>
-          <p className="text-md text-gray-700 mb-4">
-            📝 <strong>Description:</strong>{" "}
-            {selectedShift.incident.description}
-          </p>
 
-          {selectedShift.incident.photoUrl && (
-            <div className="mb-6">
-              <img
-                src={selectedShift.incident.photoUrl}
-                alt="Incident"
-                className="w-full max-h-64 object-cover rounded-md shadow"
-              />
-              <a
-                href={selectedShift.incident.photoUrl}
-                download={`report_${selectedShift.incident._id}.jpg`}
-                className="text-sm text-blue-600 hover:underline mt-2 inline-block"
-              >
-                ⬇ Download Image
-              </a>
+          {/* Side-by-side Data and Image */}
+          <div className="flex flex-col md:flex-row gap-6 mb-6">
+            {/* Left: Data */}
+            <div className="flex-1 space-y-3">
+              <p className="text-md text-gray-700">
+                📂 <strong>Category:</strong> {selectedShift.incident.category}
+              </p>
+              <p className="text-md text-gray-700">
+                🏷 <strong>Status:</strong>{" "}
+                <span
+                  className={`px-2 py-1 rounded text-white text-sm ${
+                    statusColors[selectedShift.incident.status]
+                  }`}
+                >
+                  {selectedShift.status.replace("_", " ")}
+                </span>
+              </p>
+              <p className="text-md text-gray-700">
+                📝 <strong>Description:</strong>{" "}
+                {selectedShift.incident.description}
+              </p>
             </div>
-          )}
 
+            {/* Right: Image */}
+            {selectedShift.incident.photoUrl && (
+              <div className="flex-1 max-w-md">
+                <img
+                  src={selectedShift.incident.photoUrl}
+                  alt="Incident"
+                  className="w-full max-h-64 object-cover rounded-md shadow"
+                />
+                <a
+                  href={selectedShift.incident.photoUrl}
+                  download={`report_${selectedShift.incident._id}.jpg`}
+                  className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                >
+                  ⬇ View Image
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Map full width below */}
           <div className="h-64 w-full rounded-lg overflow-hidden">
             <MapContainer
               center={[

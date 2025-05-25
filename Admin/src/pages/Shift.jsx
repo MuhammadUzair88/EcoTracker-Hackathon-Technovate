@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaEye, FaSync, FaArrowLeft } from "react-icons/fa";
+import { FaEye, FaArrowLeft } from "react-icons/fa";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -31,35 +31,6 @@ const Shift = () => {
     } catch (err) {
       console.error("Failed to fetch shifts", err);
     }
-  };
-
-  const updateStatus = async (shiftId, currentStatus) => {
-    if (!navigator.geolocation) {
-      alert("Geolocation not supported.");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
-      const nextStatus =
-        currentStatus === "assigned"
-          ? "in_progress"
-          : currentStatus === "in_progress"
-          ? "resolved"
-          : null;
-
-      if (!nextStatus) return;
-
-      try {
-        await axios.put(`http://localhost:5000/api/shift/update/${shiftId}`, {
-          status: nextStatus,
-          lat: coords.latitude,
-          lng: coords.longitude,
-        });
-        fetchShifts();
-      } catch (err) {
-        console.error("Failed to update shift", err);
-      }
-    });
   };
 
   const renderMap = (coords, label) =>
@@ -178,7 +149,7 @@ const Shift = () => {
                 <td className="px-6 py-4 text-gray-700">
                   {shift.endTime?.slice(0, 16)}
                 </td>
-                <td className="px-6 py-4 text-center space-x-4">
+                <td className="px-6 py-4 text-center">
                   <button
                     onClick={() => setSelectedShift(shift)}
                     title="View"
@@ -186,15 +157,6 @@ const Shift = () => {
                   >
                     <FaEye />
                   </button>
-                  {shift.status !== "resolved" && (
-                    <button
-                      onClick={() => updateStatus(shift._id, shift.status)}
-                      className="text-blue-500 hover:text-blue-700"
-                      title="Update Status"
-                    >
-                      <FaSync />
-                    </button>
-                  )}
                 </td>
               </tr>
             ))}

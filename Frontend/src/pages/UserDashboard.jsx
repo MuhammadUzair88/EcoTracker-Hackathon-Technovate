@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import axios from "axios";
+import { useAuth } from "../context/UserContext";
 
 // Fix Leaflet marker icons
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import axios from "axios";
-import { useAuth } from "../context/UserContext";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -27,8 +27,7 @@ const statusColors = {
 const UserDashboard = () => {
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
-
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -42,98 +41,116 @@ const UserDashboard = () => {
       }
     };
     fetchReports();
-  }, []);
+  }, [user.id]);
 
   return (
     <div className="w-full px-4 sm:px-8 lg:px-20 py-10 bg-green-50 min-h-screen">
       {!selectedReport ? (
         <>
-          <h2 className="text-3xl font-bold text-green-700 mb-8 text-center">
+          <h2 className="text-3xl font-bold text-green-700 mb-10 text-center">
             📋 My Reported Incidents
           </h2>
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
             {reports.map((report) => (
               <div
                 key={report._id}
-                className="bg-white border-l-4 p-6 rounded-xl shadow-sm hover:shadow-lg border-green-600 transition duration-300"
+                className="bg-white border-l-4 border-green-600 p-5 rounded-xl shadow-md hover:shadow-xl transition duration-300 flex flex-col justify-between"
               >
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div className="flex flex-col gap-y-2">
-                    <h3 className="text-xl font-semibold text-green-800 capitalize">
-                      {report.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 capitalize">
-                      📂 <strong>Category:</strong> {report.category}
-                    </p>
-                    <p className="text-sm text-gray-600 mt-1 capitalize">
-                      🏷 <strong>Status:</strong>{" "}
-                      <span
-                        className={`text-white px-4 py-1 rounded-3xl ${
-                          statusColors[report.status]
-                        }`}
-                      >
-                        {report.status.replace("_", " ")}
-                      </span>
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSelectedReport(report)}
-                    className="text-sm bg-green-700 hover:bg-green-900 text-white px-4 py-2 rounded-md shadow transition"
-                  >
-                    View Details
-                  </button>
+                <div>
+                  <h3 className="text-xl font-semibold text-green-800 capitalize mb-2">
+                    {report.title}
+                  </h3>
+                  <p className="text-sm text-gray-700 mb-1">
+                    📂 <strong>Category:</strong> {report.category}
+                  </p>
+                  <p className="text-sm text-gray-700 mb-3">
+                    🏷 <strong>Status:</strong>{" "}
+                    <span
+                      className={`text-white px-3 py-1 rounded-full text-xs font-medium ${
+                        statusColors[report.status]
+                      }`}
+                    >
+                      {report.status.replace("_", " ")}
+                    </span>
+                  </p>
                 </div>
+                <button
+                  onClick={() => setSelectedReport(report)}
+                  className="mt-4 bg-green-700 hover:bg-green-800 text-white text-sm py-2 rounded-md shadow"
+                >
+                  View Details
+                </button>
               </div>
             ))}
           </div>
         </>
       ) : (
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bg-white rounded-xl shadow-xl p-8">
+          {/* Back button */}
           <button
             onClick={() => setSelectedReport(null)}
-            className="mb-4 text-sm text-blue-600 hover:underline"
+            className="mb-6 text-sm text-blue-600 hover:underline"
           >
             ← Back to all reports
           </button>
-          <h2 className="text-2xl font-bold text-green-700 mb-1">
+
+          {/* Centered Title and Time */}
+          <h2 className="text-2xl font-bold text-green-700 mb-2 text-center">
             {selectedReport.title}
           </h2>
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-gray-500 mb-6 text-center">
             🕓 Submitted: {new Date(selectedReport.createdAt).toLocaleString()}
           </p>
-          <p className="text-md text-gray-700 mb-1">
-            📂 <strong>Category:</strong> {selectedReport.category}
-          </p>
-          <p className="text-md text-gray-700 mb-1">
-            🏷 <strong>Status:</strong>{" "}
-            <span
-              className={`px-2 py-1 rounded text-white text-sm ${
-                statusColors[selectedReport.status]
-              }`}
-            >
-              {selectedReport.status.replace("_", " ")}
-            </span>
-          </p>
-          <p className="text-md text-gray-700 mb-4">
-            📝 <strong>Description:</strong> {selectedReport.description}
-          </p>
-          {selectedReport.photoUrl && (
-            <div className="mb-6">
-              <img
-                src={selectedReport.photoUrl}
-                alt="Incident"
-                className="w-full max-h-64 object-cover rounded-md shadow"
-              />
-              <a
-                href={selectedReport.photoUrl}
-                download={`report_${selectedReport._id}.jpg`}
-                className="text-sm text-blue-600 hover:underline mt-2 inline-block"
-              >
-                ⬇️ Download Image
-              </a>
+
+          {/* Report content grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Left: Report Details */}
+            <div className="space-y-3">
+              <p className="text-md text-gray-700">
+                📂 <strong>Category:</strong> {selectedReport.category}
+              </p>
+              <p className="text-md text-gray-700">
+                🏷 <strong>Status:</strong>{" "}
+                <span
+                  className={`px-2 py-1 rounded text-white text-sm ${
+                    statusColors[selectedReport.status]
+                  }`}
+                >
+                  {selectedReport.status.replace("_", " ")}
+                </span>
+              </p>
+              <p className="text-lg text-gray-700">
+                📝 <strong>Description:</strong> {selectedReport.description}
+              </p>
             </div>
-          )}
-          <div className="h-64 w-full rounded-lg overflow-hidden">
+
+            {/* Right: Image */}
+            <div className="flex flex-col items-center justify-start">
+              {selectedReport.photoUrl ? (
+                <>
+                  <img
+                    src={selectedReport.photoUrl}
+                    alt="Incident"
+                    className="w-full max-h-80 object-contain rounded-lg shadow bg-gray-100"
+                  />
+                  <a
+                    href={selectedReport.photoUrl}
+                    download={`report_${selectedReport._id}.jpg`}
+                    className="text-sm text-blue-600 hover:underline mt-2"
+                  >
+                    ⬇️ View Image
+                  </a>
+                </>
+              ) : (
+                <div className="text-sm text-gray-500 italic">
+                  📷 No image uploaded for this report.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Map */}
+          <div className="h-80 w-full rounded-lg overflow-hidden">
             <MapContainer
               center={[selectedReport.latitude, selectedReport.longitude]}
               zoom={16}

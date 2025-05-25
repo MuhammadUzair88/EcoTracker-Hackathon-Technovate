@@ -1,12 +1,12 @@
-const Incident = require('../models/incidents');
-const Staff = require('../models/staff');
-const Shift = require('../models/Shift');
-const User = require('../models/User');
+const incidents = require("../models/incidents");
+const Shift = require("../models/Shift");
+const staff = require("../models/staff");
+const User = require("../models/User");
 
 exports.getAdminDashboardSummary = async (req, res) => {
   try {
     // Total incidents by status
-    const incidentCounts = await Incident.aggregate([
+    const incidentCounts = await incidents.aggregate([
       {
         $group: {
           _id: '$status',
@@ -14,24 +14,32 @@ exports.getAdminDashboardSummary = async (req, res) => {
         }
       }
     ]);
-
-    // Map incident counts to an object like { new: 5, verified: 10, ... }
     const incidentsByStatus = incidentCounts.reduce((acc, curr) => {
       acc[curr._id] = curr.count;
       return acc;
     }, {});
 
-    // Total staff
-    const totalStaff = await Staff.countDocuments();
+    // Incidents by category
+    const categoryCounts = await incidents.aggregate([
+      {
+        $group: {
+          _id: '$category',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    const incidentsByCategory = categoryCounts.reduce((acc, curr) => {
+      acc[curr._id] = curr.count;
+      return acc;
+    }, {});
 
-    // Total users
+    const totalStaff = await staff.countDocuments();
     const totalUsers = await User.countDocuments();
+    const activeShifts = await Shift.countDocuments({
+      status: { $in: ['assigned', 'in_progress'] }
+    });
 
-    // Active shifts (status assigned or in_progress)
-    const activeShifts = await Shift.countDocuments({ status: { $in: ['assigned', 'in_progress'] } });
-
-    // Recent incidents - latest 5
-    const recentIncidents = await Incident.find({})
+    const recentIncidents = await incidents.find({})
       .sort({ createdAt: -1 })
       .limit(5)
       .select('title status createdAt')
@@ -41,6 +49,7 @@ exports.getAdminDashboardSummary = async (req, res) => {
       success: true,
       data: {
         incidentsByStatus,
+        incidentsByCategory, // Include this in the response
         totalStaff,
         totalUsers,
         activeShifts,
