@@ -39,9 +39,6 @@ EcoTracker is a powerful full-stack platform that empowers citizens to report en
 ![image](https://github.com/user-attachments/assets/93b02b06-c636-4dbf-a9dd-20f6d90831fc)
 ![image](https://github.com/user-attachments/assets/694a92c5-c75a-4612-bc7f-5e00f2717563)
 
-
-
-
 ---
 
 ### 🧠 Admin Dashboard (Admin)
@@ -53,6 +50,18 @@ EcoTracker is a powerful full-stack platform that empowers citizens to report en
 * Full analytics: report stats, staff count, shift logs
 
 📸 **\[Insert Admin Dashboard Screenshot here]**
+![image](https://github.com/user-attachments/assets/1147b775-8731-4cea-8edb-3db16e5a7cd7)
+![image](https://github.com/user-attachments/assets/759b9c87-e290-4914-96af-da1d83cc613f)
+![image](https://github.com/user-attachments/assets/91c226ab-cfb0-4e4f-ad10-72663860119d)
+![image](https://github.com/user-attachments/assets/911a7a91-15cb-40d9-8443-458cd2e24289)
+![image](https://github.com/user-attachments/assets/1d402e25-b3c3-43c0-8b3e-90cc4aed5b9e)
+![image](https://github.com/user-attachments/assets/6aa35677-59e8-4fe6-b4d3-103a419f4e51)
+![image](https://github.com/user-attachments/assets/707e73ec-cc4d-4894-bbba-876dd00565e5)
+![image](https://github.com/user-attachments/assets/216f95fa-e2c5-4c81-a44b-1b5f17e86f08)
+![image](https://github.com/user-attachments/assets/0e485d94-f88d-4237-a719-2c171cee0f38)
+![image](https://github.com/user-attachments/assets/b9e55ab4-cecf-4e98-944c-60cde7398a17)
+![image](https://github.com/user-attachments/assets/09234826-9cb2-4f39-add2-9c7c38386f7a)
+
 
 ---
 
@@ -64,6 +73,11 @@ EcoTracker is a powerful full-stack platform that empowers citizens to report en
 * Complete shift logs for transparency
 
 📸 **\[Insert Staff Dashboard Screenshot here]**
+![image](https://github.com/user-attachments/assets/d4da9107-f641-4674-9f40-ec8e3127b3ac)
+![image](https://github.com/user-attachments/assets/73bb6863-e8f3-4a19-a8a7-8aba44e60656)
+![image](https://github.com/user-attachments/assets/e2370384-4801-4a95-907c-2af1bd7e06bc)
+![image](https://github.com/user-attachments/assets/396d14f4-9350-4a4c-ba62-d0312e38de32)
+
 
 ---
 
@@ -82,8 +96,7 @@ EcoTracker is a powerful full-stack platform that empowers citizens to report en
 * Live dashboards with charts and map heatmaps
 * Status breakdown: pending, in-progress, resolved
 * Time-to-resolve statistics
-* Historical logs and staff performance tracking
-
+  
 ---
 
 ## 🚀 How to Run Locally
@@ -91,7 +104,7 @@ EcoTracker is a powerful full-stack platform that empowers citizens to report en
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/EcoTracker.git
+[git clone https://github.com/your-username/EcoTracker.git](https://github.com/MuhammadUzair88/EcoTracker-Hackathon-Technovate.git)
 cd EcoTracker
 ```
 
@@ -148,7 +161,6 @@ npm run dev
 | Cloud Storage | Cloudinary                           |
 | Maps & Geo    | Leaflet, Geolocation API             |
 | Auth          | JWT, Bcrypt                          |
-| Deployment    | Vercel (Frontend), Railway (Backend) |
 
 ---
 
